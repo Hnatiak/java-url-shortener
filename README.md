@@ -2,6 +2,10 @@
 
 REST API service for creating shortened URLs with user authentication using JWT.
 
+![Java](https://img.shields.io/badge/Java-21-orange)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5-brightgreen)
+![Build](https://img.shields.io/badge/CI-GitHub_Actions-blue)
+
 ---
 
 ## Technologies
@@ -53,7 +57,7 @@ REST API service for creating shortened URLs with user authentication using JWT.
 * Unit tests
 * Integration tests
 * Controller tests with MockMvc
-* CI pipeline with GitHub Actions
+* Automated CI pipeline with GitHub Actions
 
 ---
 
@@ -124,8 +128,6 @@ src/main/java/org/example/urlshortener
 ---
 
 ## Running PostgreSQL
-
-Start database:
 
 ```bash
 docker compose up -d
@@ -199,8 +201,6 @@ http://localhost:8080/swagger-ui.html
 
 `POST /api/v1/auth/register`
 
-Request:
-
 ```json
 {
   "username": "roman",
@@ -208,21 +208,9 @@ Request:
 }
 ```
 
-Response:
-
-```json
-{
-  "token": "User successfully registered"
-}
-```
-
----
-
 ### Login
 
 `POST /api/v1/auth/login`
-
-Request:
 
 ```json
 {
@@ -243,65 +231,31 @@ Response:
 
 ## Short URLs
 
-### Create Short URL
+### Create
 
 `POST /api/v1/urls`
 
-Authorization:
-
-```text
-Bearer Token
-```
-
-Request:
-
-```json
-{
-  "originalUrl": "https://google.com",
-  "expiresAt": "2027-12-31T23:59:59"
-}
-```
-
----
-
-### Get All URLs
+### Get All
 
 `GET /api/v1/urls`
 
-Authorization required.
-
----
-
-### Get Active URLs
+### Get Active
 
 `GET /api/v1/urls/active`
 
-Authorization required.
-
----
-
-### Update URL
+### Update
 
 `PUT /api/v1/urls/{id}`
 
-Authorization required.
-
-Request:
-
-```json
-{
-  "originalUrl": "https://youtube.com",
-  "expiresAt": "2028-12-31T23:59:59"
-}
-```
-
----
-
-### Delete URL
+### Delete
 
 `DELETE /api/v1/urls/{id}`
 
-Authorization required.
+Authorization required:
+
+```text
+Bearer <JWT_TOKEN>
+```
 
 ---
 
@@ -317,19 +271,17 @@ Example:
 http://localhost:8080/r/abc12345
 ```
 
-Returns HTTP redirect to original URL.
+Returns HTTP redirect to the original URL.
 
 ---
 
 ## Testing
 
-Run all tests:
+Run tests:
 
 ```bash
 ./gradlew test
 ```
-
-Implemented tests:
 
 ### Unit Tests
 
@@ -371,7 +323,7 @@ On every:
 
 Roman Hnatiak
 
-Java URL Shortener project created for learning:
+This project was created for learning and practicing:
 
 * Spring Boot
 * Spring Security
