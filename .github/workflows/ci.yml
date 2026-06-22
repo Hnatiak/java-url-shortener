@@ -10,6 +10,22 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: url_shortener
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+
+    env:
+      DB_URL: jdbc:postgresql://localhost:5432/url_shortener
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      JWT_SECRET: mySuperSecretKeyForJwtToken12345678901234567890
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
