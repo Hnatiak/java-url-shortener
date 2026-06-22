@@ -1,8 +1,13 @@
 package org.example.urlshortener.redirect.service;
 
+import java.time.LocalDateTime;
+
 import org.example.urlshortener.shorturl.entity.ShortUrl;
 import org.example.urlshortener.shorturl.repository.ShortUrlRepository;
 import org.springframework.stereotype.Service;
+
+import org.example.urlshortener.common.exception.NotFoundException;
+import org.example.urlshortener.common.exception.BadRequestException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -17,13 +22,20 @@ public class RedirectService {
         ShortUrl shortUrl =
                 shortUrlRepository
                         .findByShortCode(shortCode)
-                        .orElseThrow();
+                        .orElseThrow(() -> new NotFoundException("Short URL not found"));
 
-        shortUrl.setClickCount(
-                shortUrl.getClickCount() + 1
+        if (shortUrl.getExpiresAt().isBefore(LocalDateTime.now()) || shortUrl.getExpiresAt().isEqual(LocalDateTime.now())) {
+            throw new BadRequestException("Link expired");
+        }
+
+        int updated =
+        shortUrlRepository.incrementClickCount(
+                shortCode
         );
 
-        shortUrlRepository.save(shortUrl);
+        if (updated == 0) {
+            throw new IllegalStateException("Counter update failed");
+        }
 
         return shortUrl.getOriginalUrl();
     }

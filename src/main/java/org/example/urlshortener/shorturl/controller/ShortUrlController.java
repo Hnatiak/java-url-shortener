@@ -5,6 +5,7 @@ import java.util.List;
 import org.example.urlshortener.shorturl.dto.CreateShortUrlRequest;
 import org.example.urlshortener.shorturl.dto.ShortUrlDetailsResponse;
 import org.example.urlshortener.shorturl.dto.ShortUrlResponse;
+import org.example.urlshortener.shorturl.dto.UpdateShortUrlRequest;
 import org.example.urlshortener.shorturl.service.ShortUrlService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -12,10 +13,12 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -27,11 +30,11 @@ public class ShortUrlController {
 
     @PostMapping
     public ShortUrlResponse createUrl(
-            @RequestBody
-            CreateShortUrlRequest request,
-
-            Authentication authentication
-    ) {
+                @Valid
+                @RequestBody
+                CreateShortUrlRequest request,
+                Authentication authentication
+        ) {
 
         return shortUrlService.createShortUrl(
                 request,
@@ -59,6 +62,24 @@ public class ShortUrlController {
                 authentication.getName()
         );
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> updateUrl(
+                @PathVariable Long id,
+                @Valid
+                @RequestBody
+                UpdateShortUrlRequest request,
+                Authentication authentication
+        ) {
+
+            shortUrlService.updateUrl(
+                    id,
+                    request,
+                    authentication.getName()
+            );
+
+            return ResponseEntity.ok().build();
+        }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUrl(
