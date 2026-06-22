@@ -1,15 +1,23 @@
 services:
-
   postgres:
-
     image: postgres:17
-
     container_name: url-shortener-db
-
     environment:
       POSTGRES_DB: url_shortener
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-
     ports:
       - "5432:5432"
+
+  app:
+    build: .
+    container_name: url-shortener-app
+    depends_on:
+      - postgres
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/url_shortener
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      JWT_SECRET: mySuperSecretJwtKey123456789
+    ports:
+      - "8080:8080"

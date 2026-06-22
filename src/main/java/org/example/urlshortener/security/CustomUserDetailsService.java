@@ -21,13 +21,11 @@ public class CustomUserDetailsService
     ) throws UsernameNotFoundException {
 
         User user =
-                userRepository.findByUsername(
-                        username
-                ).orElseThrow(
-                        () -> new UsernameNotFoundException(
-                                "User not found"
-                        )
-                );
+                userRepository.findByUsername(username).orElseThrow(
+                                        () -> new UsernameNotFoundException(
+                                                "User not found"
+                                        )
+                                );
 
         return org.springframework.security.core.userdetails.User
                 .withUsername(user.getUsername())
