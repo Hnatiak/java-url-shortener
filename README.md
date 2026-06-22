@@ -1,6 +1,8 @@
 # URL Shortener API
 
-REST API сервіс для створення скорочених URL-посилань з авторизацією користувачів через JWT.
+REST API service for creating shortened URLs with user authentication using JWT.
+
+---
 
 ## Technologies
 
@@ -15,6 +17,10 @@ REST API сервіс для створення скорочених URL-пос�
 * Swagger / OpenAPI
 * Lombok
 * Gradle
+* JUnit 5
+* Mockito
+* MockMvc
+* GitHub Actions (CI)
 
 ---
 
@@ -25,49 +31,74 @@ REST API сервіс для створення скорочених URL-пос�
 * User registration
 * User login
 * JWT token generation
-* Protected endpoints
+* Protected endpoints with Spring Security
 
 ### URL Management
 
 * Create short URL
+* Update short URL
 * Redirect by short code
 * Get all user URLs
 * Get active URLs
 * Delete URL
 * Click counter
 
+### Error Handling
+
+* Custom exceptions
+* Global exception handling with `@RestControllerAdvice`
+
+### Testing
+
+* Unit tests
+* Integration tests
+* Controller tests with MockMvc
+* CI pipeline with GitHub Actions
+
 ---
 
 ## Project Structure
 
+```plaintext
 src/main/java/org/example/urlshortener
+```
 
-* auth
+### auth
 
-  * controller
-  * dto
-  * entity
-  * repository
-  * service
+* controller
+* dto
+* entity
+* repository
+* service
 
-* security
+### security
 
-  * config
-  * JwtService
-  * JwtAuthenticationFilter
-  * CustomUserDetailsService
+* config
+* JwtService
+* JwtAuthenticationFilter
+* CustomUserDetailsService
 
-* shorturl
+### shorturl
 
-  * controller
-  * dto
-  * entity
-  * repository
-  * service
+* controller
+* dto
+* entity
+* repository
+* service
+
+### redirect
+
+* controller
+* service
+
+### common
+
+* exception
+* config
 
 ---
 
-## Database
+## Database Schema
 
 ### users
 
@@ -94,51 +125,81 @@ src/main/java/org/example/urlshortener
 
 ## Running PostgreSQL
 
+Start database:
+
+```bash
 docker compose up -d
+```
 
 Check container:
 
+```bash
 docker ps
+```
 
 ---
 
 ## Application Configuration
 
-application.properties
+`application.properties`
 
-spring.datasource.url=jdbc:postgresql://localhost:5432/url_shortener
+```properties
+spring.datasource.url=${DB_URL}
+spring.datasource.username=${DB_USERNAME}
+spring.datasource.password=${DB_PASSWORD}
 
-spring.datasource.username=postgres
+jwt.secret=${JWT_SECRET}
 
-spring.datasource.password=postgres
+spring.jpa.hibernate.ddl-auto=validate
+spring.flyway.enabled=true
+spring.jpa.show-sql=true
+springdoc.swagger-ui.path=/swagger-ui.html
+```
+
+Example environment variables:
+
+```env
+DB_URL=jdbc:postgresql://localhost:5432/url_shortener
+DB_USERNAME=postgres
+DB_PASSWORD=postgres
+JWT_SECRET=your-super-secret-key
+```
 
 ---
 
 ## Run Application
 
-Windows:
+### Windows
 
+```bash
 gradlew.bat bootRun
+```
 
-Linux / Mac:
+### Linux / Mac
 
+```bash
 ./gradlew bootRun
+```
 
 ---
 
-## Swagger
+## Swagger / OpenAPI
 
+```text
 http://localhost:8080/swagger-ui.html
+```
 
 ---
 
-## API Endpoints
+# API Endpoints
+
+## Authentication
 
 ### Register
 
-POST /api/v1/auth/register
+`POST /api/v1/auth/register`
 
-Request
+Request:
 
 ```json
 {
@@ -146,12 +207,22 @@ Request
   "password": "Password123"
 }
 ```
+
+Response:
+
+```json
+{
+  "token": "User successfully registered"
+}
+```
+
+---
 
 ### Login
 
-POST /api/v1/auth/login
+`POST /api/v1/auth/login`
 
-Request
+Request:
 
 ```json
 {
@@ -160,7 +231,7 @@ Request
 }
 ```
 
-Response
+Response:
 
 ```json
 {
@@ -168,58 +239,131 @@ Response
 }
 ```
 
+---
+
+## Short URLs
+
 ### Create Short URL
 
-POST /api/v1/urls
+`POST /api/v1/urls`
 
 Authorization:
 
+```text
 Bearer Token
+```
+
+Request:
 
 ```json
 {
   "originalUrl": "https://google.com",
-  "expiresAt": "2026-12-31T23:59:59"
+  "expiresAt": "2027-12-31T23:59:59"
 }
 ```
 
+---
+
 ### Get All URLs
 
-GET /api/v1/urls
+`GET /api/v1/urls`
 
-Authorization:
+Authorization required.
 
-Bearer Token
+---
 
 ### Get Active URLs
 
-GET /api/v1/urls/active
+`GET /api/v1/urls/active`
 
-Authorization:
+Authorization required.
 
-Bearer Token
+---
+
+### Update URL
+
+`PUT /api/v1/urls/{id}`
+
+Authorization required.
+
+Request:
+
+```json
+{
+  "originalUrl": "https://youtube.com",
+  "expiresAt": "2028-12-31T23:59:59"
+}
+```
+
+---
 
 ### Delete URL
 
-DELETE /api/v1/urls/{id}
+`DELETE /api/v1/urls/{id}`
 
-Authorization:
+Authorization required.
 
-Bearer Token
+---
 
-### Redirect
+## Redirect
 
-GET /{shortCode}
+### Redirect by short code
+
+`GET /r/{shortCode}`
 
 Example:
 
-http://localhost:8080/OyEg1Sp2
+```text
+http://localhost:8080/r/abc12345
+```
+
+Returns HTTP redirect to original URL.
+
+---
+
+## Testing
+
+Run all tests:
+
+```bash
+./gradlew test
+```
+
+Implemented tests:
+
+### Unit Tests
+
+* ShortUrlServiceTest
+* RedirectServiceTest
+
+### Integration Tests
+
+* AuthControllerTest
+* ShortUrlControllerTest
+* RedirectControllerTest
+
+---
+
+## CI / GitHub Actions
+
+GitHub Actions automatically runs:
+
+* Build
+* Unit tests
+* Integration tests
+
+On every:
+
+* push
+* pull request
 
 ---
 
 ## Build
 
+```bash
 ./gradlew clean build
+```
 
 ---
 
@@ -227,4 +371,11 @@ http://localhost:8080/OyEg1Sp2
 
 Roman Hnatiak
 
-Java URL Shortener project created for learning Spring Boot, Security, JWT and PostgreSQL.
+Java URL Shortener project created for learning:
+
+* Spring Boot
+* Spring Security
+* JWT
+* PostgreSQL
+* Testing
+* CI/CD
