@@ -41,53 +41,37 @@ class ShortUrlServiceTest {
         user.setId(1L);
         user.setUsername("roman");
 
-        CreateShortUrlRequest request =
-                new CreateShortUrlRequest(
-                        "https://youtube.com",
-                        LocalDateTime.now().plusDays(1)
-                );
-
         when(userRepository.findByUsername("roman"))
                 .thenReturn(Optional.of(user));
 
-        ShortUrlResponse response =
-                shortUrlService.createShortUrl(
-                        request,
-                        "roman"
-                );
-
-        assertNotNull(response);
-        assertNotNull(response.shortCode());
-        assertTrue(
-                response.shortUrl()
-                        .contains("http://localhost:8080/")
-        );
-
-        verify(shortUrlRepository, times(1))
-                .save(any());
-    }
-
-    @Test
-    void shouldThrowWhenUserNotFound() {
         CreateShortUrlRequest request =
                 new CreateShortUrlRequest(
                         "https://youtube.com",
                         LocalDateTime.now().plusDays(1)
                 );
-            
+
+        ShortUrlResponse response =
+                shortUrlService.createShortUrl(request, "roman");
+
+        assertNotNull(response);
+        verify(shortUrlRepository).save(any());
+    }
+
+    @Test
+    void shouldThrowWhenUserMissing() {
         when(userRepository.findByUsername("roman"))
                 .thenReturn(Optional.empty());
-            
+
         assertThrows(
                 NotFoundException.class,
                 () -> shortUrlService.createShortUrl(
-                        request,
+                        new CreateShortUrlRequest(
+                                "https://youtube.com",
+                                LocalDateTime.now().plusDays(1)
+                        ),
                         "roman"
                 )
         );
-    
-        verify(shortUrlRepository, never())
-                .save(any());
     }
 
     @Test

@@ -51,10 +51,13 @@ public class JwtAuthenticationFilter
         String token =
                 header.substring(7);
 
-        String username =
-                jwtService.extractUsername(
-                        token
-                );
+        String username;
+        try {
+            username = jwtService.extractUsername(token);
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
 
         if (username != null
                 && SecurityContextHolder

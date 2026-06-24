@@ -6,7 +6,7 @@ import static org.mockito.Mockito.*;
 
 import java.time.LocalDateTime;
 
-import org.example.urlshortener.common.exception.BadRequestException;
+import org.example.urlshortener.common.exception.LinkExpiredException;
 import org.example.urlshortener.common.exception.NotFoundException;
 import org.example.urlshortener.shorturl.entity.ShortUrl;
 import org.example.urlshortener.shorturl.repository.ShortUrlRepository;
@@ -70,7 +70,7 @@ class RedirectServiceTest {
                 .thenReturn(Optional.of(shortUrl));
 
         assertThrows(
-                BadRequestException.class,
+                LinkExpiredException.class,
                 () -> redirectService.redirect("abc123")
         );
 

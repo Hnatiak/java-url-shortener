@@ -2,6 +2,7 @@ package org.example.urlshortener.shorturl.dto;
 
 import java.time.LocalDateTime;
 
+import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -16,5 +17,6 @@ public record CreateShortUrlRequest(
     String originalUrl,
 
     @NotNull
+    @Future
     LocalDateTime expiresAt
 ) {}
