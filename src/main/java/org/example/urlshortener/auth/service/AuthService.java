@@ -6,6 +6,8 @@ import org.example.urlshortener.auth.dto.LoginRequest;
 import org.example.urlshortener.auth.dto.RegisterRequest;
 import org.example.urlshortener.auth.entity.User;
 import org.example.urlshortener.auth.repository.UserRepository;
+import org.example.urlshortener.common.exception.ConflictException;
+import org.example.urlshortener.common.exception.UnauthorizedException;
 import org.example.urlshortener.security.JwtService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -27,10 +29,7 @@ public class AuthService {
         if (userRepository.existsByUsername(
                 request.username()
         )) {
-
-            throw new RuntimeException(
-                    "Username already exists"
-            );
+            throw new ConflictException("Username already exists");
         }
 
         User user = new User();
@@ -55,27 +54,20 @@ public class AuthService {
 
     public String login(LoginRequest request) {
 
-        User user =
-                userRepository.findByUsername(
-                        request.username()
-                ).orElseThrow(
-                        () -> new RuntimeException(
-                                "Invalid credentials"
-                        )
-                );
-
-        if (!passwordEncoder.matches(
-                request.password(),
-                user.getPassword()
-        )) {
-
-            throw new RuntimeException(
-                    "Invalid credentials"
+            User user = userRepository
+                    .findByUsername(request.username())
+                    .orElseThrow(() ->
+                            new UnauthorizedException("Invalid credentials"));
+        
+            if (!passwordEncoder.matches(
+                    request.password(),
+                    user.getPassword()
+            )) {
+                throw new UnauthorizedException("Invalid credentials");
+            }
+    
+            return jwtService.generateToken(
+                    user.getUsername()
             );
         }
-
-        return jwtService.generateToken(
-                user.getUsername()
-        );
-    }
 }

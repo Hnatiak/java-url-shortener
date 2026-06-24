@@ -6,8 +6,8 @@ import org.example.urlshortener.shorturl.entity.ShortUrl;
 import org.example.urlshortener.shorturl.repository.ShortUrlRepository;
 import org.springframework.stereotype.Service;
 
+import org.example.urlshortener.common.exception.LinkExpiredException;
 import org.example.urlshortener.common.exception.NotFoundException;
-import org.example.urlshortener.common.exception.BadRequestException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,7 +25,7 @@ public class RedirectService {
                         .orElseThrow(() -> new NotFoundException("Short URL not found"));
 
         if (shortUrl.getExpiresAt().isBefore(LocalDateTime.now()) || shortUrl.getExpiresAt().isEqual(LocalDateTime.now())) {
-            throw new BadRequestException("Link expired");
+            throw new LinkExpiredException("Link expired");
         }
 
         int updated =

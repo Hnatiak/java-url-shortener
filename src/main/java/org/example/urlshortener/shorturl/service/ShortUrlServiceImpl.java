@@ -1,18 +1,17 @@
 package org.example.urlshortener.shorturl.service;
 
-import org.example.urlshortener.shorturl.dto.UpdateShortUrlRequest;
-import org.example.urlshortener.common.exception.NotFoundException;
-import org.example.urlshortener.common.exception.AccessDeniedException;
-
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Random;
 
 import org.example.urlshortener.auth.entity.User;
 import org.example.urlshortener.auth.repository.UserRepository;
+import org.example.urlshortener.common.exception.AccessDeniedException;
+import org.example.urlshortener.common.exception.NotFoundException;
 import org.example.urlshortener.shorturl.dto.CreateShortUrlRequest;
 import org.example.urlshortener.shorturl.dto.ShortUrlDetailsResponse;
 import org.example.urlshortener.shorturl.dto.ShortUrlResponse;
+import org.example.urlshortener.shorturl.dto.UpdateShortUrlRequest;
 import org.example.urlshortener.shorturl.entity.ShortUrl;
 import org.example.urlshortener.shorturl.repository.ShortUrlRepository;
 import org.springframework.stereotype.Service;
@@ -26,6 +25,21 @@ public class ShortUrlServiceImpl
 
     private final ShortUrlRepository shortUrlRepository;
     private final UserRepository userRepository;
+    private static final SecureRandom random = new SecureRandom();
+
+    private String generateUniqueCode() {
+            String code;
+
+            do {
+                code = generateCode();
+            } while (
+                    shortUrlRepository
+                            .findByShortCode(code)
+                            .isPresent()
+            );
+
+            return code;
+        }
 
     @Override
     public ShortUrlResponse createShortUrl(
@@ -37,7 +51,7 @@ public class ShortUrlServiceImpl
                 userRepository.findByUsername(username)
                         .orElseThrow(() -> new NotFoundException("User not found"));
 
-        String code = generateCode();
+        String code = generateUniqueCode();
 
         ShortUrl shortUrl = new ShortUrl();
         shortUrl.setOriginalUrl(request.originalUrl());
@@ -51,15 +65,15 @@ public class ShortUrlServiceImpl
 
         return new ShortUrlResponse(
                 code,
-                "http://localhost:8080/" + code
+                "http://localhost:8080/r/" + code
         );
     }
+    
 
     private String generateCode() {
         String chars =
                 "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
-        Random random = new Random();
         StringBuilder code = new StringBuilder();
 
         for (int i = 0; i < 8; i++) {

@@ -39,8 +39,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(
-            @RequestBody
-            LoginRequest request
+            @Valid @RequestBody LoginRequest request
     ) {
     
         String token =
